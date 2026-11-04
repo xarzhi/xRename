@@ -1,0 +1,31 @@
+[package]
+name = "xrename"
+version = "0.2.1"
+edition = "2024"
+description = "Batch rename tool for files and folders, built with gpui-kit"
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+gpui-kit = "0.8.1"
+# 只为解码 logo：窗口图标（X11）要在启动时拿到 RgbaImage
+image = { version = "0.25", default-features = false, features = ["png"] }
+libloading = "0.8"
+rfd = "0.15"
+
+[target.'cfg(windows)'.build-dependencies]
+# 把 assets/logo.ico 和版本信息编进 exe，资源管理器 / 任务栏才认得图标
+winresource = "0.1"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+# 注意：不能用 panic = "abort"。用户脚本是 catch_unwind 托住的，
+# abort 会让脚本里一个 panic 直接带走整个程序。
